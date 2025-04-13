@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Lưu trữ Tài liệu</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="landing-page" class="landing-page">
+        <header class="landing-header">
+            <h1>Hệ thống Lưu trữ Tài liệu Thông Minh</h1>
+            <p class="subtitle">Giải pháp lưu trữ và quản lý tài liệu hiện đại</p>
+        </header>
+
+        <main class="landing-main">
+            <section class="features">
+                <div class="feature-card">
+                    <i class="feature-icon">📁</i>
+                    <h3>Lưu Trữ An Toàn</h3>
+                    <p>Bảo mật dữ liệu với công nghệ mã hóa tiên tiến</p>
+                </div>
+                <div class="feature-card">
+                    <i class="feature-icon">🔄</i>
+                    <h3>Đồng Bộ Hóa</h3>
+                    <p>Truy cập tài liệu mọi lúc, mọi nơi</p>
+                </div>
+                <div class="feature-card">
+                    <i class="feature-icon">🔍</i>
+                    <h3>Tìm Kiếm Nhanh</h3>
+                    <p>Dễ dàng tìm kiếm và quản lý tài liệu</p>
+                </div>
+            </section>
+
+            <section class="auth-section">
+                <h2>Bắt đầu ngay</h2>
+                <p>Đăng nhập để trải nghiệm đầy đủ tính năng</p>
+                <button id="googleSignInBtn" class="btn">Đăng nhập bằng Google</button>
+            </section>
+        </main>
+
+        <footer class="landing-footer">
+            <p>&copy; 2024 Hệ thống Lưu trữ Tài liệu. Mọi quyền được bảo lưu.</p>
+        </footer>
+    </div>
+
+    <div id="app" class="app" style="display: none;">
+        <header>
+            <h1>Hệ thống Lưu trữ Tài liệu</h1>
+            <nav>
+                <button id="uploadBtn" class="btn">Tải lên tài liệu</button>
+                <input type="file" id="fileInput" style="display: none;" multiple>
+                <button id="logoutBtn" class="btn">Đăng xuất</button>
+            </nav>
+        </header>
+
+        <main>
+            <div class="document-list" id="documentList">
+                <!-- Danh sách tài liệu sẽ được thêm vào đây -->
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

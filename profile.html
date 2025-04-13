@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ người dùng - Hệ thống Lưu trữ Tài liệu</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-avatar {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-info h1 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+        }
+
+        .profile-info p {
+            margin: 0.25rem 0;
+            color: #666;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+        }
+
+        .stat-card p {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 4px;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-button:hover {
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <a href="./index.html" class="back-button">← Quay lại trang chủ</a>
+        
+        <div class="profile-header">
+            <img id="profileAvatar" class="profile-avatar" src="https://via.placeholder.com/128" alt="Avatar">
+            <div class="profile-info">
+                <h1 id="profileName">Đang tải...</h1>
+                <p id="profileEmail">Đang tải...</p>
+                <p>Thành viên từ: <span id="profileJoinDate">Đang tải...</span></p>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>Tổng số tài liệu</h3>
+                <p id="totalDocuments">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Dung lượng đã sử dụng</h3>
+                <p id="totalStorage">0 MB</p>
+            </div>
+            <div class="stat-card">
+                <h3>Tài liệu quan trọng</h3>
+                <p id="importantDocuments">0</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, onAuthStateChanged } from './firebase-config.js';
+
+        // Kiểm tra trạng thái đăng nhập
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Cập nhật thông tin người dùng
+                document.getElementById('profileAvatar').src = user.photoURL || 'https://via.placeholder.com/128';
+                document.getElementById('profileName').textContent = user.displayName || 'Người dùng';
+                document.getElementById('profileEmail').textContent = user.email;
+                document.getElementById('profileJoinDate').textContent = new Date(user.metadata.creationTime).toLocaleDateString('vi-VN');
+
+                // Lấy thống kê từ localStorage
+                const documents = JSON.parse(localStorage.getItem('documents')) || [];
+                const userDocuments = documents.filter(doc => true); // Sau này có thể lọc theo userId
+
+                // Cập nhật thống kê
+                document.getElementById('totalDocuments').textContent = userDocuments.length;
+                
+                const totalBytes = userDocuments.reduce((acc, doc) => acc + doc.size, 0);
+                const totalMB = (totalBytes / (1024 * 1024)).toFixed(2);
+                document.getElementById('totalStorage').textContent = `${totalMB} MB`;
+
+                const importantDocs = userDocuments.filter(doc => doc.isImportant).length;
+                document.getElementById('importantDocuments').textContent = importantDocs;
+            } else {
+                // Nếu chưa đăng nhập, chuyển về trang chủ
+                window.location.href = './index.html';
+            }
+        });
+    </script>
+</body>
+</html>

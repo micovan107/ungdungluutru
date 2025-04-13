@@ -21,7 +21,7 @@ No registration, no cloud, data is saved locally.
 
 ## Keywords
 
-Ứng dụng lưu trữ, Storage App, Note App, Local Storage, JavaScript Web App, Task Manager, Personal Notes, Offline Web App, HTML CSS JavaScript, Simple Storage, Todo App, Browser Storage.
+Ứng dụng lưu trữ, Storage App, Note App, Local Storage, JavaScript Web App, Task Manager, Personal Notes, Offline Web App, HTML CSS JavaScript, Dikey-kho lưu trữ,Simple Storage, Todo App, Browser Storage.
 
 ---
 

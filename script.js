@@ -12,14 +12,16 @@ async function handleGoogleSignIn() {
     }
 }
 
-// Theo dõi trạng thái xác thực
+// Kiểm tra trạng thái đăng nhập
 onAuthStateChanged(auth, (user) => {
     if (user) {
         document.getElementById('landing-page').style.display = 'none';
         document.getElementById('app').style.display = 'block';
+        document.getElementById('userAvatar').src = user.photoURL || 'https://via.placeholder.com/32';
+        loadDocuments();
     } else {
-        document.getElementById('app').style.display = 'none';
         document.getElementById('landing-page').style.display = 'block';
+        document.getElementById('app').style.display = 'none';
     }
 });
 
@@ -236,3 +238,8 @@ function formatSize(bytes) {
 
 // Hiển thị tài liệu khi trang được tải
 renderDocuments();
+
+// Xử lý click vào avatar
+document.getElementById('userAvatar').addEventListener('click', () => {
+    window.location.href = './profile.html';
+});

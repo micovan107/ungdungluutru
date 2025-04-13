@@ -228,6 +228,14 @@ window.deleteDocument = function(id) {
     renderDocuments();
 }
 
+// Hiển thị tài liệu khi trang được tải
+renderDocuments();
+
+// Xử lý click vào avatar
+document.getElementById('userAvatar').addEventListener('click', () => {
+    window.location.href = './profile.html';
+});
+
 // Định dạng kích thước file
 function formatSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -236,10 +244,70 @@ function formatSize(bytes) {
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
 
-// Hiển thị tài liệu khi trang được tải
-renderDocuments();
+// Xử lý tìm kiếm
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
 
-// Xử lý click vào avatar
-document.getElementById('userAvatar').addEventListener('click', () => {
-    window.location.href = './profile.html';
+// Hàm tìm kiếm tài liệu
+function searchDocuments(keyword) {
+    keyword = keyword.toLowerCase().trim();
+    if (!keyword) {
+        renderDocuments();
+        return;
+    }
+
+    const filteredDocs = documents.filter(doc => 
+        doc.name.toLowerCase().includes(keyword)
+    );
+
+    documentList.innerHTML = filteredDocs.length > 0 ? 
+        filteredDocs.map(doc => `
+            <div class="document-card ${doc.isImportant ? 'important' : ''}">
+                <h3>${doc.name} ${doc.isLocked ? '🔒' : ''} ${doc.isImportant ? '⭐' : ''}</h3>
+                <p>Kích thước: ${formatSize(doc.size)}</p>
+                <p>Ngày tải lên: ${doc.uploadDate}</p>
+                <div class="actions">
+                    <button class="btn" onclick="viewDocument(${doc.id})" ${doc.isLocked ? 'disabled' : ''}>Xem</button>
+                    <button class="btn" onclick="downloadDocument(${doc.id})" ${doc.isLocked ? 'disabled' : ''}>Tải xuống</button>
+                    <button class="menu-btn" onclick="toggleMenu(${doc.id})">...</button>
+                    <div class="menu-options" id="menu-${doc.id}">
+                        <div class="menu-option" onclick="editDocument(${doc.id})">
+                            <i>✏️</i> Sửa
+                        </div>
+                        <div class="menu-option" onclick="shareDocument(${doc.id})">
+                            <i>🔗</i> Chia sẻ
+                        </div>
+                        <div class="menu-option" onclick="lockDocument(${doc.id})">
+                            <i>🔒</i> ${doc.isLocked ? 'Mở khóa' : 'Khóa'}
+                        </div>
+                        <div class="menu-option" onclick="markImportant(${doc.id})">
+                            <i>⭐</i> ${doc.isImportant ? 'Bỏ đánh dấu' : 'Đánh dấu'} quan trọng
+                        </div>
+                        <div class="menu-option" onclick="deleteDocument(${doc.id})">
+                            <i>🗑️</i> Xóa
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('') : 
+        '<div class="no-results">Không tìm thấy tài liệu nào phù hợp</div>';
+}
+
+// Xử lý sự kiện nhập liệu trong ô tìm kiếm
+searchInput.addEventListener('input', () => {
+    if (searchInput.value.trim() === '') {
+        renderDocuments();
+    }
+});
+
+// Xử lý sự kiện nhấn Enter trong ô tìm kiếm
+searchInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+        searchDocuments(searchInput.value);
+    }
+});
+
+// Xử lý sự kiện click nút tìm kiếm
+searchBtn.addEventListener('click', () => {
+    searchDocuments(searchInput.value);
 });

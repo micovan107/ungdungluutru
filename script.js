@@ -1,7 +1,13 @@
 import { auth, provider, signInWithPopup, onAuthStateChanged, signOut } from './firebase-config.js';
 
 // Lưu trữ tài liệu trong LocalStorage
-let documents = JSON.parse(localStorage.getItem('documents')) || [];
+let documents = [];
+
+// Tải dữ liệu từ localStorage
+function loadDocuments() {
+    documents = JSON.parse(localStorage.getItem('documents')) || [];
+    renderDocuments();
+}
 
 // Xử lý đăng nhập với Google
 async function handleGoogleSignIn() {
@@ -83,17 +89,30 @@ import { documentViewer } from './modal.js';
 window.viewDocument = function(docId) {
     const doc = documents.find(d => d.id === docId);
     if (doc) {
-        // Chuyển đổi base64 thành Blob
-        const byteString = atob(doc.content.split(',')[1]);
-        const mimeString = doc.content.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
+        try {
+            // Kiểm tra nếu nội dung là base64
+            if (doc.content.startsWith('data:')) {
+                const [header, base64Data] = doc.content.split(',');
+                const mimeString = header.split(':')[1].split(';')[0];
+                const byteString = atob(base64Data);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                const blob = new Blob([ab], {type: mimeString});
+                const file = new File([blob], doc.name, {type: mimeString});
+                documentViewer.viewDocument(file);
+            } else {
+                // Xử lý nội dung văn bản thông thường
+                const blob = new Blob([doc.content], {type: 'text/html'});
+                const file = new File([blob], doc.name, {type: 'text/html'});
+                documentViewer.viewDocument(file);
+            }
+        } catch (error) {
+            console.error('Lỗi khi xử lý tài liệu:', error);
+            alert('Không thể mở tài liệu này. Vui lòng kiểm tra định dạng tài liệu.');
         }
-        const blob = new Blob([ab], {type: mimeString});
-        const file = new File([blob], doc.name, {type: mimeString});
-        documentViewer.viewDocument(file);
     }
 }
 
@@ -310,4 +329,8 @@ searchInput.addEventListener('keyup', (e) => {
 // Xử lý sự kiện click nút tìm kiếm
 searchBtn.addEventListener('click', () => {
     searchDocuments(searchInput.value);
+});
+
+document.querySelector('.compose-btn').addEventListener('click', () => {
+    window.location.href = 'editor.html';
 });

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soạn thảo - Hệ thống Lưu trữ Tài liệu</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .editor-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .editor-title {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 1rem;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .toolbar button {
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .toolbar button:hover {
+            background: #e9ecef;
+        }
+
+        .editor-content {
+            min-height: 500px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .save-btn {
+            padding: 0.5rem 1rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background: #218838;
+        }
+
+        .cancel-btn {
+            padding: 0.5rem 1rem;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cancel-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <div class="editor-header">
+            <input type="text" class="editor-title" placeholder="Nhập tiêu đề tài liệu...">
+        </div>
+
+        <div class="toolbar">
+            <button onclick="document.execCommand('bold')"><i class="fas fa-bold"></i></button>
+            <button onclick="document.execCommand('italic')"><i class="fas fa-italic"></i></button>
+            <button onclick="document.execCommand('underline')"><i class="fas fa-underline"></i></button>
+            <button onclick="document.execCommand('strikeThrough')"><i class="fas fa-strikethrough"></i></button>
+            <button onclick="document.execCommand('justifyLeft')"><i class="fas fa-align-left"></i></button>
+            <button onclick="document.execCommand('justifyCenter')"><i class="fas fa-align-center"></i></button>
+            <button onclick="document.execCommand('justifyRight')"><i class="fas fa-align-right"></i></button>
+            <button onclick="document.execCommand('insertUnorderedList')"><i class="fas fa-list-ul"></i></button>
+            <button onclick="document.execCommand('insertOrderedList')"><i class="fas fa-list-ol"></i></button>
+        </div>
+
+        <div class="editor-content" contenteditable="true"></div>
+
+        <div class="action-buttons">
+            <button class="cancel-btn" onclick="window.location.href='index.html'">Hủy bỏ</button>
+            <button class="save-btn" onclick="saveDocument()">Lưu tài liệu</button>
+        </div>
+    </div>
+
+    <script>
+        function saveDocument() {
+            const title = document.querySelector('.editor-title').value;
+            const content = document.querySelector('.editor-content').innerHTML;
+            
+            if (!title.trim()) {
+                alert('Vui lòng nhập tiêu đề tài liệu!');
+                return;
+            }
+
+            // Tạo đối tượng tài liệu mới
+            const newDocument = {
+                id: Date.now() + Math.random(),
+                name: title,
+                type: 'text/html',
+                size: new Blob([content]).size,
+                content: content,
+                uploadDate: new Date().toLocaleString()
+            };
+            
+            // Lấy danh sách tài liệu hiện có
+            let documents = JSON.parse(localStorage.getItem('documents')) || [];
+            
+            // Thêm tài liệu mới vào danh sách
+            documents.push(newDocument);
+            
+            // Lưu danh sách cập nhật vào localStorage
+            localStorage.setItem('documents', JSON.stringify(documents));
+            
+            // Chuyển hướng về trang chủ
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

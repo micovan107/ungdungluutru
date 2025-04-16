@@ -54,29 +54,81 @@ uploadBtn.addEventListener('click', () => {
     fileInput.click();
 });
 
+// Hàm chuyển đổi ảnh sang PDF
+async function convertImageToPdf(imageFile) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const img = new Image();
+                img.src = event.target.result;
+                
+                await new Promise(resolve => img.onload = resolve);
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: img.width > img.height ? 'l' : 'p',
+                    unit: 'px',
+                    format: [img.width, img.height]
+                });
+                
+                pdf.addImage(canvas.toDataURL('image/jpeg'), 'JPEG', 0, 0, img.width, img.height);
+                const pdfData = pdf.output('datauristring');
+                resolve(pdfData);
+            } catch (error) {
+                reject(error);
+            }
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(imageFile);
+    });
+}
+
 // Xử lý khi chọn file
 fileInput.addEventListener('change', async (e) => {
     const files = Array.from(e.target.files);
     
     for (const file of files) {
-        const reader = new FileReader();
-        
-        reader.onload = (event) => {
+        try {
+            let content;
+            let type = file.type;
+            let name = file.name;
+            
+            if (file.type.startsWith('image/')) {
+                content = await convertImageToPdf(file);
+                type = 'application/pdf';
+                name = name.replace(/\.[^\.]+$/, '.pdf');
+            } else {
+                const reader = new FileReader();
+                content = await new Promise((resolve, reject) => {
+                    reader.onload = (event) => resolve(event.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+            
             const document = {
                 id: Date.now() + Math.random(),
-                name: file.name,
-                type: file.type,
+                name: name,
+                type: type,
                 size: file.size,
-                content: event.target.result,
+                content: content,
                 uploadDate: new Date().toLocaleString()
             };
             
             documents.push(document);
             localStorage.setItem('documents', JSON.stringify(documents));
             renderDocuments();
-        };
-        
-        reader.readAsDataURL(file);
+        } catch (error) {
+            console.error('Lỗi khi xử lý file:', error);
+            alert(`Không thể xử lý file ${file.name}. Vui lòng thử lại.`);
+        }
     }
     
     fileInput.value = '';
